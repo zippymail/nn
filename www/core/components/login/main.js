@@ -18,11 +18,11 @@ angular.module('mm.core.login', [])
 
     $stateProvider
 
-    .state('mm_login', {
+        .state('mm_login', {
         url: '/mm_login',
         abstract: true,
         templateUrl: 'core/components/login/templates/base.html',
-        cache: false,   // Disable caching to force controller reload.
+        cache: false, // Disable caching to force controller reload.
         onEnter: function($ionicHistory) {
             // Ensure that there is no history stack when getting here.
             $ionicHistory.clearHistory();
@@ -51,8 +51,14 @@ angular.module('mm.core.login', [])
     .state('mm_login.site', {
         url: '/site',
         templateUrl: 'core/components/login/templates/site.html',
-        controller: 'mmLoginSiteCtrl'
+        controller: 'mmLoginSiteCtrl',
+        onEnter: function($state) {
+            $state.go('mm_login.credentials', {
+                siteurl: 'http://mantissystems.com/moodle'
+            });
+        }
     })
+
 
     .state('mm_login.credentials', {
         url: '/cred',
@@ -64,7 +70,7 @@ angular.module('mm.core.login', [])
         onEnter: function($state, $stateParams) {
             // Do not allow access to this page when the URL was not passed.
             if (!$stateParams.siteurl) {
-              $state.go('mm_login.init');
+                $state.go('mm_login.init');
             }
         }
     })
@@ -92,7 +98,7 @@ angular.module('mm.core.login', [])
 })
 
 .run(function($log, $state, $mmUtil, $translate, $mmSitesManager, $rootScope, $mmSite, $mmURLDelegate, $ionicHistory,
-                $mmEvents, $mmLoginHelper, mmCoreEventSessionExpired, $mmApp) {
+    $mmEvents, $mmLoginHelper, mmCoreEventSessionExpired, $mmApp) {
 
     $log = $log.getInstance('mmLogin');
 
@@ -165,8 +171,14 @@ angular.module('mm.core.login', [])
                 } else {
                     var info = $mmSite.getInfo();
                     if (typeof(info) !== 'undefined' && typeof(info.username) !== 'undefined') {
-                        $ionicHistory.nextViewOptions({disableBack: true});
-                        $state.go('mm_login.reconnect', {siteurl: siteurl, username: info.username, infositeurl: info.siteurl});
+                        $ionicHistory.nextViewOptions({
+                            disableBack: true
+                        });
+                        $state.go('mm_login.reconnect', {
+                            siteurl: siteurl,
+                            username: info.username,
+                            infositeurl: info.siteurl
+                        });
                     }
                 }
             });
@@ -190,7 +202,7 @@ angular.module('mm.core.login', [])
         // Decode from base64.
         try {
             url = atob(url);
-        } catch(err) {
+        } catch (err) {
             // Error decoding the parameter.
             $log.error('Error decoding parameter received for login SSO');
             return false;
